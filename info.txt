@@ -1,0 +1,8 @@
+I downloaded my data from this link
+
+https://www.kaggle.com/datasets/rtlmhjbn/ip02-dataset
+
+this data set is already split for train/test/val
+downloading, unzipping, and setting correct file paths should get you started
+
+pay attention to the preview of the training data set, some images are incorrect

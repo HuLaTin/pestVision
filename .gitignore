@@ -1,0 +1,4 @@
+Data/*
+Data/*.tar
+Data/ip102_v1.1-001.tar
+Model/resnet50_0.497.pkl

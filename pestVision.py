@@ -45,7 +45,7 @@ val_df.columns = ['image_path','label']
 
 print(train_df.head())
 
-#folder paths, including r makes the string literal
+#folder paths, including r makes the 'raw'
 TRAIN_DIR = r'Data\classification\train'
 TEST_DIR = r'Data\classification\test'
 VAL_DIR = r'Data\classification\val'

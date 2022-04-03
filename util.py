@@ -8,7 +8,7 @@ import numpy as np
 
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset #, DataLoader
 
 #from pestVision import BATCH_SIZE
 
@@ -16,21 +16,22 @@ class InsectModel(nn.Module):
     def __init__(self,num_classes):
         super(InsectModel, self).__init__()
         self.num_classes = num_classes
-        self.model = timm.create_model('vit_base_patch16_224',pretrained=True,num_classes=num_classes) # pretrained model?
+        self.model = timm.create_model('vit_base_patch16_224',pretrained=True,num_classes=num_classes) # timm can create/load in models that are in the library
+        #timm.list_models(), to view all models in library, timm.list_models('*vit_base_patch*') to search
     def forward(self, image):
         return self.model(image)
 
-def train_transform(): # transforming the images of train set
+def train_transform(): # transforming the images of train set, I'd like to add a desaturate
     return A.Compose([
         A.HorizontalFlip(),
         A.RandomRotate90(),
-        A.RandomBrightnessContrast(),
-        A.Resize(224, 224),
+        #A.RandomBrightnessContrast(), I don't think this would help (based on notebooks i've seen)
+        A.Resize(224, 224), # resize the images
         ToTensorV2()])
 
 def valid_transform(): # transforming the images of the validation set
     return A.Compose([
-        A.Resize(224,224),
+        A.Resize(224,224), # resize images
         ToTensorV2()])
 
 def collate_fn(batch):
@@ -95,7 +96,7 @@ def train_fn(data_loader, model, criterion, device, optimizer, epoch, BATCH_SIZE
         output = model(images)
         loss = criterion(output, labels)
         
-        optimizer.zero_grad()
+        optimizer.zero_grad() # zeros out gradients in optimizer
         loss.backward()
         optimizer.step()
         
@@ -129,15 +130,15 @@ def eval_fn(data_loader, model, criterion, device, epoch, BATCH_SIZE):
 
 def run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader):
     model = InsectModel(num_classes=102) # num of classes
-    model = model.to(device)
-    criterion = nn.CrossEntropyLoss() # criterion
-    criterion = criterion.to(device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=LR) # optimizer
+    model = model.to(device) # move model to selected device, CPU/GPU
+    criterion = nn.CrossEntropyLoss() # calculates cross entropy between input and target
+    criterion = criterion.to(device) # criterion to device
+    optimizer = torch.optim.AdamW(model.parameters(), lr=LR) # optimizer AdamW 'does not generalize well'
     best_loss = 10**5
     for epoch in range(0, EPOCH):
         train_loss = train_fn(train_data_loader, model, criterion, device, optimizer, epoch, BATCH_SIZE)
         val_loss = eval_fn(val_data_loader, model, criterion, device, epoch, BATCH_SIZE)
         if val_loss.avg < best_loss:
             best_loss = val_loss.avg
-            torch.save(model.state_dict(), f'vit_best.pth') # change path
-        print(f'Epoch {epoch+1+0:03}: | Train Loss: {train_loss.avg:.5f} | Val Loss: {val_loss.avg:.5f}')
+            torch.save(model.state_dict(), f'vit_best.pth')
+        print(f'Epoch {epoch+1+0:03}: | Train Loss: {train_loss.avg:.5f} | Val Loss: {val_loss.avg:.5f}') #f for better string formatting

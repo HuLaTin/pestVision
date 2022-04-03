@@ -14,14 +14,14 @@ from textwrap import wrap
 
 import torch
 #import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader#, Dataset
 
 #import cv2 # cpu computer vision package
 import matplotlib.pyplot as plt
 #import seaborn as sns
 
-import albumentations as A #not familiar with this error this creates 'libiomp5md.dll'
-from albumentations.pytorch.transforms import ToTensorV2
+#import albumentations as A #not familiar with this error this creates 'libiomp5md.dll'
+#from albumentations.pytorch.transforms import ToTensorV2
 
 #import timm
 
@@ -52,10 +52,12 @@ TRAIN_DIR = r'Data\classification\train'
 TEST_DIR = r'Data\classification\test'
 VAL_DIR = r'Data\classification\val'
 LR = 2e-5
-BATCH_SIZE = 8
-EPOCH = 2
+BATCH_SIZE = 8 # number of training examples per pass
+EPOCH = 2 # each epoch is a pass of all training examples
 
-device = torch.device('cuda') # CUDA for use with GPU, include for cpu?
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # Use GPU if available
+device = torch.device('cpu') # i keep running out of memory (2GB gpu), running on cpu for now
+# could resize images for memory constraints?
 
 # preview random images
 fig, axs = plt.subplots(3,4,figsize=(50,50)) # upping sizing a bit to better inspect
@@ -76,6 +78,16 @@ plt.show() # show plot
 ########
 
 # i have added this since email, probably doesnt work
+# probably will work, havent allowed full training on model
+# will take some time
+
+# some notes
+# learn about optimizers, models
+# could we resize for memory efficiency?
+# test differnent configs?
+# better accuracy from different transformations
+# the orginal code is for ViT Vision Transformer a model trained on ImageNet-21k
+# https://huggingface.co/google/vit-base-patch16-224
 
 train_dataset = util.InsectDataset(image=train_df.values, 
                               image_dir=TRAIN_DIR, 
@@ -94,24 +106,24 @@ val_data_loader = DataLoader(val_dataset,
 
 util.run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader)
 
-model = util.InsectModel(num_classes=102)
-model.load_state_dict(torch.load("./vit_best.pth")) # change path
+model = util.InsectModel(num_classes=102) # could we filter the classes?
+model.load_state_dict(torch.load("./vit_best.pth"))
 images, labels = next(iter(val_data_loader))
 preds = model(images).softmax(1).argmax(1)
 
 fig, axs = plt.subplots(2,4,figsize=(13,8))
 [ax.imshow(image.permute((1,2,0))) for image,ax in zip(images,axs.ravel())]
-[ax.set_title("\n".join(wrap(f'Accutual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
+[ax.set_title("\n".join(wrap(f'Acctual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
 [ax.set_axis_off() for ax in axs.ravel()]
 plt.show()
 
 model = util.InsectModel(num_classes=102)
-model.load_state_dict(torch.load("./vit_best.pth")) # change path
+model.load_state_dict(torch.load("./vit_best.pth"))
 images, labels = next(iter(val_data_loader))
 preds = model(images).softmax(1).argmax(1)
 
 fig, axs = plt.subplots(2,4,figsize=(13,8))
 [ax.imshow(image.permute((1,2,0))) for image,ax in zip(images,axs.ravel())]
-[ax.set_title("\n".join(wrap(f'Accutual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
+[ax.set_title("\n".join(wrap(f'Acctual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
 [ax.set_axis_off() for ax in axs.ravel()]
 plt.show()

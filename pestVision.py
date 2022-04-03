@@ -1,5 +1,7 @@
-#copied from Olivia Lamm's code from Kaggle
-#IP102 dataset - Kaggle
+# Copied with edits from Olivia Lamm's notebook, Kaggle
+# https://www.kaggle.com/code/iamolivia/pytorch-vit-insect-classifier/data
+
+# IP102 dataset - Kaggle
 
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE" #use to fix libiomp5md.dll error
@@ -20,13 +22,13 @@ from torch.utils.data import DataLoader#, Dataset
 import matplotlib.pyplot as plt
 #import seaborn as sns
 
-#import albumentations as A #not familiar with this error this creates 'libiomp5md.dll'
+#import albumentations as A
 #from albumentations.pytorch.transforms import ToTensorV2
 
 #import timm
 
 f = open('Data\classes.txt') #local file path
-label = [] # empty lists
+label = [] # empty list creation
 name = []
 for line in f.readlines():
     label.append(int(line.split()[0]))
@@ -47,7 +49,7 @@ val_df.columns = ['image_path','label']
 
 print(train_df.head())
 
-#folder paths, including r makes the 'raw'
+# folder paths, including r makes the 'raw'
 TRAIN_DIR = r'Data\classification\train'
 TEST_DIR = r'Data\classification\test'
 VAL_DIR = r'Data\classification\val'
@@ -92,13 +94,16 @@ plt.show() # show plot
 train_dataset = util.InsectDataset(image=train_df.values, 
                               image_dir=TRAIN_DIR, 
                               transforms=util.train_transform())
+
 train_data_loader = DataLoader(train_dataset,
                               batch_size=BATCH_SIZE,
                               shuffle=True,
                               num_workers=2)
+
 val_dataset = util.InsectDataset(image=val_df.values,
                             image_dir=VAL_DIR,
                             transforms=util.valid_transform())
+                            
 val_data_loader = DataLoader(val_dataset,
                              batch_size=BATCH_SIZE,
                              shuffle=True,

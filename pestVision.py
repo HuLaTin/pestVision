@@ -30,7 +30,8 @@ import matplotlib.pyplot as plt # library for creating visuals
 
 #import timm # library for loading image models, optimizers, loaders, etc
 
-f = open('Data\classes.txt') #local file path
+#f = open('Data\classes.txt') #local file path
+f = open(r'Data\newClasses.txt') #local file path
 label = [] # empty list creation
 name = []
 for line in f.readlines():
@@ -41,13 +42,16 @@ classes.columns = ['label','name'] # sets column names
 print(classes.head())
 
 #read csv/txt into pandas dataframe
-train_df = pd.read_csv(r'Data\train.txt',sep=' ',header=None, engine='python') # include r before string to avoid escape characters
+#train_df = pd.read_csv(r'Data\train.txt',sep=' ',header=None, engine='python') # include r before string to avoid escape characters
+train_df = pd.read_csv(r'Data\newtrain.txt',sep=' ',header=None, engine='python') 
 train_df.columns = ['image_path','label']
 
-test_df = pd.read_csv(r'Data\test.txt',sep=' ',header=None, engine='python')
+#test_df = pd.read_csv(r'Data\test.txt',sep=' ',header=None, engine='python')
+test_df = pd.read_csv(r'Data\newtest.txt',sep=' ',header=None, engine='python')
 test_df.columns = ['image_path','label']
 
-val_df = pd.read_csv(r'Data\val.txt',sep=' ',header=None, engine='python')
+#val_df = pd.read_csv(r'Data\val.txt',sep=' ',header=None, engine='python')
+val_df = pd.read_csv(r'Data\newval.txt',sep=' ',header=None, engine='python')
 val_df.columns = ['image_path','label']
 
 print(train_df.head())
@@ -62,14 +66,16 @@ EPOCH = 2 # each epoch is a pass of all training examples
 
 #device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # Use GPU if available
 device = torch.device('cpu') # i keep running out of memory (2GB gpu), running on cpu for now
+
 # could resize images for memory constraints?
 
 # preview random images
 fig, axs = plt.subplots(3,4,figsize=(50,50)) # upping sizing a bit to better inspect
 images = []
 for i in classes.label:
+    #print(i)
     random_img = random.choice(train_df[train_df.label==i-1].image_path.values) # choose images randomly
-    label = classes.name[i-1] # label images
+    label = classes.loc[classes['label'] == i, 'name'].iloc[0]  # label images
     img = plt.imread(os.path.join(TRAIN_DIR,str(i-1),random_img))
     images.append(img)
 
@@ -86,9 +92,9 @@ plt.show() # show plot
 # some notes
 # learn about optimizers, models
 # could we resize for memory efficiency?
-# test differnent configs?
+# test different configs?
 # better accuracy from different transformations
-# the orginal code is for ViT Vision Transformer a model trained on ImageNet-21k
+# the orginal model, ViT Vision Transformer a model trained on ImageNet-21k
 # https://huggingface.co/google/vit-base-patch16-224
 
 # getting 'ibpng warning ICCP: known incorrect sRGB profile
@@ -115,8 +121,9 @@ val_data_loader = DataLoader(val_dataset,
 # expect to run for a long time, >10 hours on 1 epoch on CPU
 util.run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader) # begin training/validation
 
-model = util.InsectModel(num_classes=102) # could we filter the classes?
-model.load_state_dict(torch.load("./vit_best.pth")) # load model
+len(classes)
+model = util.InsectModel(num_classes=len(classes)) # could we filter the classes?
+model.load_state_dict(torch.load(f"Model\\vit.pth")) # load model
 images, labels = next(iter(val_data_loader))
 preds = model(images).softmax(1).argmax(1)
 
@@ -127,7 +134,7 @@ fig, axs = plt.subplots(2,4,figsize=(13,8))
 plt.show()
 
 # model = util.InsectModel(num_classes=102)
-# model.load_state_dict(torch.load("./vit_best.pth"))
+# model.load_state_dict(torch.load(f"Model\\vit.pth"))
 # images, labels = next(iter(val_data_loader))
 # preds = model(images).softmax(1).argmax(1)
 

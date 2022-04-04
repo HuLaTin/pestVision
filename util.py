@@ -140,5 +140,5 @@ def run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader):
         val_loss = eval_fn(val_data_loader, model, criterion, device, epoch, BATCH_SIZE)
         if val_loss.avg < best_loss:
             best_loss = val_loss.avg
-            torch.save(model.state_dict(), f'vit_best.pth')
+            torch.save(model.state_dict(), f'Model\\vit.pth')
         print(f'Epoch {epoch+1+0:03}: | Train Loss: {train_loss.avg:.5f} | Val Loss: {val_loss.avg:.5f}') #f for better string formatting

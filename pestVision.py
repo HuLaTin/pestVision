@@ -75,12 +75,9 @@ for i in classes.label:
 [ax.set_axis_off() for ax in axs.ravel()] # set axis label
 plt.show() # show plot
 
-########
-# STOP HERE #
-########
+#########################################################################################################
 
-# i have added this since email, probably doesnt work
-# probably will work, havent allowed full training on model
+# ** probably will work, havent allowed full training on model
 # will take some time
 
 # some notes
@@ -90,6 +87,9 @@ plt.show() # show plot
 # better accuracy from different transformations
 # the orginal code is for ViT Vision Transformer a model trained on ImageNet-21k
 # https://huggingface.co/google/vit-base-patch16-224
+
+# getting 'ibpng warning ICCP: known incorrect sRGB profile
+
 
 train_dataset = util.InsectDataset(image=train_df.values, 
                               image_dir=TRAIN_DIR, 
@@ -109,10 +109,11 @@ val_data_loader = DataLoader(val_dataset,
                              shuffle=True,
                              num_workers=2)
 
+# expect to run for a long time, >10 hours on 1 epoch on CPU
 util.run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader)
 
 model = util.InsectModel(num_classes=102) # could we filter the classes?
-model.load_state_dict(torch.load("./vit_best.pth"))
+model.load_state_dict(torch.load("./vit_best.pth")) # load model
 images, labels = next(iter(val_data_loader))
 preds = model(images).softmax(1).argmax(1)
 
@@ -122,13 +123,13 @@ fig, axs = plt.subplots(2,4,figsize=(13,8))
 [ax.set_axis_off() for ax in axs.ravel()]
 plt.show()
 
-model = util.InsectModel(num_classes=102)
-model.load_state_dict(torch.load("./vit_best.pth"))
-images, labels = next(iter(val_data_loader))
-preds = model(images).softmax(1).argmax(1)
+# model = util.InsectModel(num_classes=102)
+# model.load_state_dict(torch.load("./vit_best.pth"))
+# images, labels = next(iter(val_data_loader))
+# preds = model(images).softmax(1).argmax(1)
 
-fig, axs = plt.subplots(2,4,figsize=(13,8))
-[ax.imshow(image.permute((1,2,0))) for image,ax in zip(images,axs.ravel())]
-[ax.set_title("\n".join(wrap(f'Acctual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
-[ax.set_axis_off() for ax in axs.ravel()]
-plt.show()
+# fig, axs = plt.subplots(2,4,figsize=(13,8))
+# [ax.imshow(image.permute((1,2,0))) for image,ax in zip(images,axs.ravel())]
+# [ax.set_title("\n".join(wrap(f'Acctual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
+# [ax.set_axis_off() for ax in axs.ravel()]
+# plt.show()

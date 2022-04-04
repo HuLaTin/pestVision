@@ -4,3 +4,4 @@ Data/ip102_v1.1-001.tar
 Model/resnet50_0.497.pkl
 __pycache__/*
 __pycache__/*.pyc
+vit_best.pth

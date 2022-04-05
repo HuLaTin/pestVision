@@ -1,11 +1,11 @@
-#import os
+import os
 import pandas as pd
-#import shutil
+import shutil
 import numpy as np
 
 # THIS WILL DELETE FILES
 # PLEASE BACKUP YOUR DATASET
-# actually it doesn't delete anything
+# ** actually it doesn't delete anything **
 
 f = open('Data\classes.txt') #local file path
 label = [] # empty list creation
@@ -28,6 +28,8 @@ discard = [2,3,6,8,9,10,11,12,13,14,15,16,17,22,25,26,28,29,30, \
         84,85,86,89,90,91,92,93,94,95,97,99,100,101]
 
 classes = classes.loc[~classes['label'].isin(discard)] # select rows where 'label' is not in discard list
+classes['label'] = np.arange(1, len(classes) + 1)
+
 classes.reset_index(inplace=True, drop=True) # reset index
 
 np.savetxt(r'Data\newClasses.txt', classes.to_numpy(), fmt = "%s") # save to txt file, space as delimiter
@@ -37,11 +39,17 @@ folders = ['test','train','val'] # list of folders to filter
 
 # Data\classification\test\0 # example
 # oops no need to delete images
+# might need to actually
+
 # for i in folders:
 #     folderPath = dataDir + '\\' + i
 #     for j in discard:
 #         labelPath = folderPath + '\\' + str(j - 1) # j - 1 to select the correct folder
 #         shutil.rmtree(labelPath) # removes folder!
+
+# I am manually renaming folders
+#for root, dirs, files in os.walk(r"Data\classification"):
+#    print(root)
 
 discard = [i-1 for i in discard]
 txtPath = r'Data'
@@ -58,8 +66,19 @@ for i in folders:
 
     print(i) # print train/test/val set
     print('images before filter : ', len(TXT))
+    len(TXT[1].unique())
     TXT = TXT.loc[~TXT[1].isin(discard)]
+    len(TXT[1].unique())
     print('images after filter : ', len(TXT))
+
+    indClass = list(TXT[1].unique())
+    #nextClass = iter(indClass)
+    for v,z in enumerate(range(len(classes))):
+        #print(indClass[v])
+        #print(z)
+        TXT.loc[TXT[1] == indClass[v],1] = int(z)
+
+
 
     TXT.reset_index(inplace=True, drop=True) # reset index
 
@@ -67,3 +86,4 @@ for i in folders:
     np.savetxt(txtName, TXT.to_numpy(), fmt = "%s") # save it!
 
 # entire dataset is now 32143 total images, (from ~75k)
+# we're not actually deleting anything, just modifying the classes which we train/val/test on (I think)

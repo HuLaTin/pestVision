@@ -27,6 +27,7 @@ def train_transform(): # transforming the images of train set, I'd like to add a
         A.RandomRotate90(),
         #A.RandomBrightnessContrast(), I don't think this would help (based on notebooks i've seen)
         A.Resize(224, 224), # resize the images
+        # make grayscale?
         ToTensorV2()])
 
 def valid_transform(): # transforming the images of the validation set
@@ -128,8 +129,8 @@ def eval_fn(data_loader, model, criterion, device, epoch, BATCH_SIZE):
             tk0.set_postfix(loss=summary.avg, acc=summary.acc, epoch=epoch+1)
     return summary
 
-def run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader):
-    model = InsectModel(num_classes=102) # num of classes
+def run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader, numClass):
+    model = InsectModel(num_classes=numClass) # num of classes
     model = model.to(device) # move model to selected device, CPU/GPU
     criterion = nn.CrossEntropyLoss() # calculates cross entropy between input and target
     criterion = criterion.to(device) # criterion to device

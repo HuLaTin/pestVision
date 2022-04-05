@@ -70,7 +70,7 @@ device = torch.device('cpu') # i keep running out of memory (2GB gpu), running o
 # could resize images for memory constraints?
 
 # preview random images
-fig, axs = plt.subplots(3,4,figsize=(50,50)) # upping sizing a bit to better inspect
+fig, axs = plt.subplots(3,4,figsize=(25,25)) # upping sizing a bit to better inspect
 images = []
 for i in classes.label:
     #print(i)
@@ -118,12 +118,13 @@ val_data_loader = DataLoader(val_dataset,
                              shuffle=True,
                              num_workers=2)
 
+numClass = len(classes)
 # expect to run for a long time, >10 hours on 1 epoch on CPU
-util.run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader) # begin training/validation
+util.run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader, numClass) # begin training/validation
 
 len(classes)
 model = util.InsectModel(num_classes=len(classes)) # could we filter the classes?
-model.load_state_dict(torch.load(f"Model\\vit.pth")) # load model
+model.load_state_dict(torch.load(f"Model\vit.pth")) # load model
 images, labels = next(iter(val_data_loader))
 preds = model(images).softmax(1).argmax(1)
 

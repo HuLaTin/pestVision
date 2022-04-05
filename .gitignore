@@ -5,3 +5,4 @@ Model/resnet50_0.497.pkl
 __pycache__/*
 __pycache__/*.pyc
 vit_best.pth
+Model/vit.pth

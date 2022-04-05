@@ -5,7 +5,8 @@ import numpy as np
 
 # THIS WILL DELETE FILES
 # PLEASE BACKUP YOUR DATASET
-# ** actually it doesn't delete anything **
+
+# I still have to manually rename folders 0-28
 
 f = open('Data\classes.txt') #local file path
 label = [] # empty list creation

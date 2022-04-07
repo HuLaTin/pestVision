@@ -42,7 +42,7 @@ preds = model(images).softmax(1).argmax(1)
 
 fig, axs = plt.subplots(2,4,figsize=(13,8))
 [ax.imshow(image.permute((1,2,0))) for image,ax in zip(images,axs.ravel())]
-[ax.set_title("\n".join(wrap('Actual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
+[ax.set_title("\n".join(wrap(f'Actual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
 [ax.set_axis_off() for ax in axs.ravel()]
 plt.show()
 

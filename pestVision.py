@@ -121,26 +121,3 @@ val_data_loader = DataLoader(val_dataset,
 numClass = len(classes)
 # expect to run for a long time, >10 hours on 1 epoch on CPU
 util.run(device, LR, EPOCH, BATCH_SIZE, train_data_loader, val_data_loader, numClass) # begin training/validation
-
-len(classes)
-model = util.InsectModel(num_classes=len(classes)) # could we filter the classes?
-model.load_state_dict(torch.load(f"Model\vit.pth")) # load model
-images, labels = next(iter(val_data_loader))
-preds = model(images).softmax(1).argmax(1)
-
-fig, axs = plt.subplots(2,4,figsize=(13,8))
-[ax.imshow(image.permute((1,2,0))) for image,ax in zip(images,axs.ravel())]
-[ax.set_title("\n".join(wrap(f'Actual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
-[ax.set_axis_off() for ax in axs.ravel()]
-plt.show()
-
-# model = util.InsectModel(num_classes=102)
-# model.load_state_dict(torch.load(f"Model\\vit.pth"))
-# images, labels = next(iter(val_data_loader))
-# preds = model(images).softmax(1).argmax(1)
-
-# fig, axs = plt.subplots(2,4,figsize=(13,8))
-# [ax.imshow(image.permute((1,2,0))) for image,ax in zip(images,axs.ravel())]
-# [ax.set_title("\n".join(wrap(f'Actual: {classes.name[label.item()]} Predicted: {classes.name[pred.item()]}',30)),color = 'g' if label.item()==pred.item() else 'r') for label,pred,ax in zip(labels,preds,axs.ravel())]
-# [ax.set_axis_off() for ax in axs.ravel()]
-# plt.show()
